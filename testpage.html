@@ -49,7 +49,14 @@
         xmlhttp.setRequestHeader('Access-Control-Allow-Methods', '*');
         xmlhttp.setRequestHeader('Access-Control-Allow-Origin', '*');
         xmlhttp.send();
-        console.log(xmlhttp.response);
+        annotationJSONs = JSON.parse(xmlhttp.responseText);
+        console.log(JSON.parse(xmlhttp.responseText));
+        annotationJSONs.forEach(annotationJSON => {
+            console.log(annotationJSON)
+            var annotationBuilder = new AnnotationBuilder().fromJSON(JSON.stringify(annotationJSON));
+            console.log(annotationBuilder.result.target);
+            annotationBuilder.result.target.toSelection();
+        });
     });
 
     var annotationBuilder = null;
