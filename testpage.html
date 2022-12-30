@@ -13,7 +13,8 @@
     <div id="annotation-box" style="border:1px solid black; position:absolute; top:10px; display: none">
         <form>
             <input type="text" id="annotation-comment" />
-            <input type="button" value="Send annotation!" onclick="handleAnnotation();" />
+            <input type="button" value="Send annotation!" onclick="sendAnnotation();" />
+            <input type="button" value="Cancel annotation!" onclick="cancelAnnotation();" />
         </form>
     </div>
 </body>
@@ -37,15 +38,46 @@
 
     var annotationBuilder = null;
 
+    function highlightSelection(range) {
+        var newNode = document.createElement("div");
+        newNode.setAttribute(
+            "class",
+            "highlighter-class"
+        )
+        newNode.setAttribute(
+            "style",
+            "background-color: yellow; display: inline;"
+        );
+        range.surroundContents(newNode);
+    }
+
     function confirmAnnotation() {
         console.log("Confirming selection:", window.getSelection().toString());
         annotationBuilder = new AnnotationBuilder().highlight();
+        var annotationJSON = annotationBuilder.toJSON();
+        console.log(annotationJSON);
+        highlightSelection(window.getSelection().getRangeAt(0));
         document.getElementById("confirm-annotation-box").style.display = "none";
+        var annotationBox = document.getElementById("annotation-box");
+        annotationBox.style.display = "block";
+        annotationBox.style.left = event.clientX;
+        annotationBox.style.top = event.clientY;
     }
 
-    function handleAnnotation() {
+    function sendAnnotation() {
         var annotationComment = document.getElementById("annotation-comment").value;
-        console.log(annotationComment);
+        console.log(annotationComment, annotationBuilder.toJSON());
+        document.getElementById("annotation-box").style.display = "none";
+        document.getElementById("annotation-comment").value = "";
+    }
+
+    function cancelAnnotation() {
+        var y = document.getElementsByClassName("highlighter-class");
+        for (const x of y) {
+            x.outerHTML = x.innerHTML;
+        }
+        document.getElementById("annotation-box").style.display = "none";
+        document.getElementById("annotation-comment").value = "";
     }
 
     document.addEventListener("mouseup", function (event) {
