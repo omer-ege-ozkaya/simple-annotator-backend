@@ -41,6 +41,17 @@
 
     });
 
+    document.addEventListener("DOMContentLoaded", function () {
+        var xmlhttp = new XMLHttpRequest();
+        var theUrl = "http://localhost:8081/annotations/list";
+        xmlhttp.open("GET", theUrl, false);
+        xmlhttp.setRequestHeader('Access-Control-Allow-Headers', '*');
+        xmlhttp.setRequestHeader('Access-Control-Allow-Methods', '*');
+        xmlhttp.setRequestHeader('Access-Control-Allow-Origin', '*');
+        xmlhttp.send();
+        console.log(xmlhttp.response);
+    });
+
     var annotationBuilder = null;
 
     function highlightSelection(range) {
@@ -80,7 +91,7 @@
 
         var xmlhttp = new XMLHttpRequest();
         var theUrl = "http://localhost:8081/annotations";
-        xmlhttp.open("POST", theUrl);
+        xmlhttp.open("POST", theUrl, false);
         xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xmlhttp.setRequestHeader('Access-Control-Allow-Headers', '*');
         xmlhttp.setRequestHeader('Access-Control-Allow-Methods', '*');
