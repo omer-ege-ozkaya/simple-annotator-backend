@@ -5,12 +5,17 @@
         <p>This is first paragraph!</p>
         <p>This is second paragraph!</p>
     </div>
-    <div id="confirm-annotation-box" style="border:1px solid black; position:absolute; top:10px; display: none">
+    <div id="confirm-annotation-box" style="border:1px solid black; position:absolute; display: none">
         <form>
             <input type="button" value="Annotate?" onclick="confirmAnnotation();" />
         </form>
     </div>
-    <div id="annotation-box" style="border:1px solid black; position:absolute; top:10px; display: none">
+    <div id="delete-annotation-box" style="border:1px solid black; position:absolute; display: none">
+        <form>
+            <input type="button" value="Delete annotation?" onclick="deleteAnnotation();" />
+        </form>
+    </div>
+    <div id="annotation-box" style="border:1px solid black; position:absolute; display: none">
         <form>
             <input type="text" id="annotation-comment" />
             <input type="button" value="Send annotation!" onclick="sendAnnotation();" />
@@ -46,7 +51,11 @@
         )
         newNode.setAttribute(
             "style",
-            "background-color: yellow; display: inline;"
+            "background-color: yellow; display: inline; cursor: pointer;"
+        );
+        newNode.setAttribute(
+            "onclick",
+            "showHideDeleteAnnotation();"
         );
         range.surroundContents(newNode);
     }
@@ -69,6 +78,23 @@
         console.log(annotationComment, annotationBuilder.toJSON());
         document.getElementById("annotation-box").style.display = "none";
         document.getElementById("annotation-comment").value = "";
+    }
+
+    function showHideDeleteAnnotation() {
+        var deleteAnnotationBox = document.getElementById("delete-annotation-box")
+        if (deleteAnnotationBox.style.display == "none") {
+            deleteAnnotationBox.style.display = "block";
+            deleteAnnotationBox.style.left = event.clientX;
+            deleteAnnotationBox.style.top = event.clientY;
+        } else {
+            deleteAnnotationBox.style.display = "none";
+        }
+    }
+
+    function deleteAnnotation() {
+        var deleteAnnotationBox = document.getElementById("delete-annotation-box")
+        deleteAnnotationBox.style.display = "none";
+        cancelAnnotation();
     }
 
     function cancelAnnotation() {
