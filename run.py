@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 import mongodb_handler, json, uuid
+from flask_cors import CORS
 
 app = Flask(__name__)
+cors = CORS(app)
 
 
 @app.route('/annotations/list', methods=['GET'])
