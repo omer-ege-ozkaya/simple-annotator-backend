@@ -44,6 +44,7 @@
     var annotationBuilder = null;
 
     function highlightSelection(range) {
+        // fixme: This does not work for selections covering multiple DOMs
         var newNode = document.createElement("div");
         newNode.setAttribute(
             "class",
