@@ -72,9 +72,15 @@
     }
 
     function cancelAnnotation() {
-        var y = document.getElementsByClassName("highlighter-class");
-        for (const x of y) {
-            x.outerHTML = x.innerHTML;
+        // clear all
+        var divs = document.getElementsByClassName("highlighter-class");
+        var array = new Array();
+        for (var div of divs) {
+            array.push(div);
+        }
+        while (array.length>0) {
+            var div = array.pop()
+            div.outerHTML = div.innerHTML;
         }
         document.getElementById("annotation-box").style.display = "none";
         document.getElementById("annotation-comment").value = "";
@@ -83,7 +89,6 @@
     document.addEventListener("mouseup", function (event) {
         console.log("Mouse up at", event.clientX, event.clientY);
 
-        // var annotationBox = document.getElementById("annotation-box");
         var confirmAnnotationBox = document.getElementById("confirm-annotation-box");
 
         if (window.getSelection().toString().length == 0) {
