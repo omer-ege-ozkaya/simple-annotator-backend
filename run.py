@@ -24,7 +24,7 @@ def get_annotation():
 @app.route('/annotations', methods=['POST'])
 def set_annotation():
     annotation = dict(request.json)
-    if "id" not in annotation:
+    if "id" not in annotation or annotation["id"] is None:
         annotation["id"] = "http://localhost:8081/annotations?id=" + uuid.uuid4().hex
     mongodb_handler.upsert_annotation(annotation["id"], annotation)
     annotation = mongodb_handler.get_annotation(annotation["_id"])
