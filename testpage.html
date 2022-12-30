@@ -5,17 +5,20 @@
         <p>This is first paragraph!</p>
         <p>This is second paragraph!</p>
     </div>
-    <div id="confirm-annotation-box" style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
+    <div id="confirm-annotation-box"
+        style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
         <form>
             <input type="button" value="Annotate?" onclick="confirmAnnotation();" />
         </form>
     </div>
-    <div id="delete-annotation-box" style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
+    <div id="delete-annotation-box"
+        style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
         <form>
             <input type="button" value="Delete annotation?" onclick="deleteAnnotation();" />
         </form>
     </div>
-    <div id="annotation-box" style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
+    <div id="annotation-box"
+        style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
         <form>
             <input type="text" id="annotation-comment" />
             <input type="button" value="Send annotation!" onclick="sendAnnotation();" />
@@ -56,6 +59,7 @@
             var annotationBuilder = new AnnotationBuilder().fromJSON(JSON.stringify(annotationJSON));
             console.log(annotationBuilder.result.target);
             annotationBuilder.result.target.toSelection();
+            highlightSelection(window.getSelection().getRangeAt(0));
         });
     });
 
@@ -110,7 +114,7 @@
         document.getElementById("annotation-comment").value = "";
     }
 
-    function showHideDeleteAnnotation() {
+    function showHideDeleteAnnotation() {
         var deleteAnnotationBox = document.getElementById("delete-annotation-box")
         if (deleteAnnotationBox.style.display == "none") {
             deleteAnnotationBox.style.display = "block";
@@ -134,7 +138,7 @@
         for (var div of divs) {
             array.push(div);
         }
-        while (array.length>0) {
+        while (array.length > 0) {
             var div = array.pop()
             div.outerHTML = div.innerHTML;
         }
