@@ -25,25 +25,18 @@
             <input type="button" value="Cancel annotation!" onclick="cancelAnnotation();" />
         </form>
     </div>
+    <div id="annotation-display"
+        style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
+        <div>Annotation comments</div>
+        <div>User</div>
+    </div>
 </body>
 <script src="annotation-model.js"></script>
 <script>
 
-    document.addEventListener("selectionchange", function () {
-        // var selection = window.getSelection();
-        // console.log('Selection changed.', selection);
-        // var ab = new AnnotationBuilder().highlight(); //takes current user selection and builds an Annotation
-        // var json = JSON.stringify(ab.result, false, '  '); // exports serialized version to JSON-LD
-        // var output = document.getElementById('output');
-        // output.value = json;
-        // console.log(json)
+    var annotationJSONString = null;
 
-        //  var ab2 = new AnnotationBuilder().fromJSON(json); //revives serialized version 
-        //   ab2.result.target.toSelection();
-        // console.log(selection.toString());
-
-    });
-
+    // When the page is loaded, query all the annotations.
     document.addEventListener("DOMContentLoaded", function () {
         var xmlhttp = new XMLHttpRequest();
         var theUrl = "http://localhost:8081/annotations/list";
@@ -63,8 +56,23 @@
         });
     });
 
-    var annotationBuilder = null;
+    // Show confirm annotation box upon selection.
+    document.addEventListener("mouseup", function (event) {
+        console.log("Mouse up at", event.clientX, event.clientY);
 
+        var confirmAnnotationBox = document.getElementById("confirm-annotation-box");
+
+        if (window.getSelection().toString().length == 0) {
+            confirmAnnotationBox.style.display = "none";
+        } else if (confirmAnnotationBox.style.display == "none") {
+            confirmAnnotationBox.style.display = "block";
+            confirmAnnotationBox.style.left = event.clientX;
+            confirmAnnotationBox.style.top = event.clientY;
+        }
+
+    });
+
+    // Highlight a selection.
     function highlightSelection(range) {
         // fixme: This does not work for selections covering multiple DOMs
         var newNode = document.createElement("div");
@@ -80,13 +88,37 @@
             "onclick",
             "showHideDeleteAnnotation();"
         );
+        newNode.setAttribute(
+            "onmouseover",
+            "showAnnotationDisplay(true);"
+        );
+        newNode.setAttribute(
+            "onmouseout",
+            "showAnnotationDisplay(false);"
+        );
         range.surroundContents(newNode);
     }
 
+    // Show or hide annotation display (comment, user).
+    function showAnnotationDisplay(show) {
+        var annotationDisplay = document.getElementById("annotation-display");
+        if (!show) {
+            annotationDisplay.style.display = "none";
+            return;
+        }
+        annotationDisplay.style.display = "block";
+        annotationDisplay.style.left = event.clientX;
+        annotationDisplay.style.top = event.clientY;
+    }
+
+    // Confirm a selection and create an annotation. Show comment and send popup.
     function confirmAnnotation() {
         console.log("Confirming selection:", window.getSelection().toString());
-        annotationBuilder = new AnnotationBuilder().highlight();
-        var annotationJSON = annotationBuilder.toJSON();
+        var annotationBuilder = new AnnotationBuilder().highlight();
+        annotationJSONString = annotationBuilder.toJSON();
+        var annotationJSON = JSON.parse(annotationJSONString)
+        annotationJSON.creator = "ömer"
+        annotationJSONString = JSON.stringify(annotationJSON)
         console.log(annotationJSON);
         highlightSelection(window.getSelection().getRangeAt(0));
         document.getElementById("confirm-annotation-box").style.display = "none";
@@ -96,9 +128,10 @@
         annotationBox.style.top = event.clientY;
     }
 
+    // Send annotation to annotation backend.
     function sendAnnotation() {
         var annotationComment = document.getElementById("annotation-comment").value;
-        console.log(annotationComment, annotationBuilder.toJSON());
+        console.log(annotationComment, annotationJSONString);
 
         var xmlhttp = new XMLHttpRequest();
         var theUrl = "http://localhost:8081/annotations";
@@ -107,13 +140,14 @@
         xmlhttp.setRequestHeader('Access-Control-Allow-Headers', '*');
         xmlhttp.setRequestHeader('Access-Control-Allow-Methods', '*');
         xmlhttp.setRequestHeader('Access-Control-Allow-Origin', '*');
-        xmlhttp.send(annotationBuilder.toJSON());
+        xmlhttp.send(annotationJSONString);
 
 
         document.getElementById("annotation-box").style.display = "none";
         document.getElementById("annotation-comment").value = "";
     }
 
+    // Show hide annotation delete.
     function showHideDeleteAnnotation() {
         var deleteAnnotationBox = document.getElementById("delete-annotation-box")
         if (deleteAnnotationBox.style.display == "none") {
@@ -145,21 +179,6 @@
         document.getElementById("annotation-box").style.display = "none";
         document.getElementById("annotation-comment").value = "";
     }
-
-    document.addEventListener("mouseup", function (event) {
-        console.log("Mouse up at", event.clientX, event.clientY);
-
-        var confirmAnnotationBox = document.getElementById("confirm-annotation-box");
-
-        if (window.getSelection().toString().length == 0) {
-            confirmAnnotationBox.style.display = "none";
-        } else if (confirmAnnotationBox.style.display == "none") {
-            confirmAnnotationBox.style.display = "block";
-            confirmAnnotationBox.style.left = event.clientX;
-            confirmAnnotationBox.style.top = event.clientY;
-        }
-
-    });
 
 </script>
 
