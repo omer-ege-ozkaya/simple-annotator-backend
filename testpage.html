@@ -27,8 +27,8 @@
     </div>
     <div id="annotation-display"
         style="border:1px solid black; position:absolute; display: none; box-shadow: 10px 10px 5px; border-radius: 5px; background-color: white;">
-        <div>Annotation comments</div>
-        <div>User</div>
+        <div id="annotation-display-comment">Annotation comments</div>
+        <div id="annotation-display-creator">User</div>
     </div>
 </body>
 <script src="annotation-model.js"></script>
@@ -49,10 +49,11 @@
         console.log(JSON.parse(xmlhttp.responseText));
         annotationJSONs.forEach(annotationJSON => {
             console.log(annotationJSON)
-            var annotationBuilder = new AnnotationBuilder().fromJSON(JSON.stringify(annotationJSON));
+            var annotationJSONString = JSON.stringify(annotationJSON);
+            var annotationBuilder = new AnnotationBuilder().fromJSON(annotationJSONString);
             console.log(annotationBuilder.result.target);
             annotationBuilder.result.target.toSelection();
-            highlightSelection(window.getSelection().getRangeAt(0));
+            highlightSelection(window.getSelection().getRangeAt(0), annotationJSONString);
         });
     });
 
@@ -73,8 +74,9 @@
     });
 
     // Highlight a selection.
-    function highlightSelection(range) {
+    function highlightSelection(range, annotationJSONString) {
         // fixme: This does not work for selections covering multiple DOMs
+
         var newNode = document.createElement("div");
         newNode.setAttribute(
             "class",
@@ -90,22 +92,31 @@
         );
         newNode.setAttribute(
             "onmouseover",
-            "showAnnotationDisplay(true);"
+            "showAnnotationDisplay(true, this);"
         );
         newNode.setAttribute(
             "onmouseout",
-            "showAnnotationDisplay(false);"
+            "showAnnotationDisplay(false, null);"
         );
+        newNode.setAttribute(
+            "data-annotation",
+            annotationJSONString
+        )
         range.surroundContents(newNode);
     }
 
     // Show or hide annotation display (comment, user).
-    function showAnnotationDisplay(show) {
+    function showAnnotationDisplay(show, divElement) {
         var annotationDisplay = document.getElementById("annotation-display");
         if (!show) {
             annotationDisplay.style.display = "none";
             return;
         }
+        var annotationJSONString = divElement.dataset.annotation;
+        annotationJSON = JSON.parse(annotationJSONString);
+        document.getElementById("annotation-display-comment").innerHTML = "user comment";
+        document.getElementById("annotation-display-creator").innerHTML = "Author: " + annotationJSON.creator;
+
         annotationDisplay.style.display = "block";
         annotationDisplay.style.left = event.clientX;
         annotationDisplay.style.top = event.clientY;
@@ -120,7 +131,7 @@
         annotationJSON.creator = "ömer"
         annotationJSONString = JSON.stringify(annotationJSON)
         console.log(annotationJSON);
-        highlightSelection(window.getSelection().getRangeAt(0));
+        highlightSelection(window.getSelection().getRangeAt(0), annotationJSONString);
         document.getElementById("confirm-annotation-box").style.display = "none";
         var annotationBox = document.getElementById("annotation-box");
         annotationBox.style.display = "block";
